@@ -1,0 +1,7 @@
+project = libcrails-http-client
+
+using version
+using config
+using test
+using install
+using dist

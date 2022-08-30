@@ -1,0 +1,12 @@
+: 1
+name: libcrails-http-client
+version: 2.0.0
+summary: http client based on Boost.Beast, designed to run within a Crails server
+license: BSD-3-Clause
+description-file: README.md
+url: https://github.com/crails-framework/libcrails-http-client
+email: michael@unetresgrossebite.com
+depends: * build2 >= 0.15.0
+depends: * bpkg >= 0.15.0
+depends: libcrails ^2.0.0
+depends: libboost-beast >= 1.74.0

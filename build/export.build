@@ -1,0 +1,6 @@
+$out_root/
+{
+  include libcrails-http-client/
+}
+
+export $out_root/libcrails-http-client/$import.target
