@@ -22,13 +22,16 @@ namespace Crails
     virtual void disconnect() = 0;
     virtual HttpResponse query(const HttpRequest& request) = 0;
     virtual void async_query(const HttpRequest& request, AsyncCallback) = 0;
+
+  protected:
+    bool connected = false;
   };
 
   class Client : public ClientInterface, std::enable_shared_from_this<Client>
   {
     typedef boost::asio::ip::tcp::resolver Resolver;
   public:
-    Client(std::string_view host, unsigned short port);
+    Client(std::string_view host, unsigned short port = 80);
     virtual ~Client() override;
 
     HttpResponse query(const HttpRequest&) override;
@@ -47,7 +50,7 @@ namespace Crails
     class Client : public ClientInterface, public std::enable_shared_from_this<Client>
     {
     public:
-      Client(std::string_view host, unsigned short port);
+      Client(std::string_view host, unsigned short port = 443);
       virtual ~Client() override;
 
       HttpResponse query(const HttpRequest&) override;

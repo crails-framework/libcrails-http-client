@@ -63,6 +63,8 @@ Ssl::Client::Client(std::string_view host, unsigned short port) :
 
 Ssl::Client::~Client()
 {
+  if (connected)
+    disconnect();
 }
 
 void Ssl::Client::connect()
@@ -85,6 +87,7 @@ void Ssl::Client::connect()
 
   // Perform the SSL handshake
   stream.handshake(boost::asio::ssl::stream_base::client);
+  connected = true;
 }
 
 void Crails::Ssl::Client::disconnect()
@@ -92,6 +95,7 @@ void Crails::Ssl::Client::disconnect()
   // Gracefully close the stream
   boost::beast::error_code ec;
 
+  connected = false;
   stream.shutdown(ec);
   if (ec == boost::asio::error::eof)
   {
@@ -124,7 +128,8 @@ Client::Client(std::string_view host, unsigned short port) :
 
 Client::~Client()
 {
-  disconnect();
+  if (connected)
+    disconnect();
 }
 
 void Client::connect()
@@ -133,6 +138,7 @@ void Client::connect()
   const auto results = resolver.resolve(host, boost::lexical_cast<std::string>(port));
 
   stream.connect(results);
+  connected = true;
 }
 
 void Client::disconnect()
@@ -140,6 +146,7 @@ void Client::disconnect()
   try
   {
     stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+    connected = false;
   }
   catch (const std::exception& e)
   {
