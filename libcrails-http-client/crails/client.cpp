@@ -2,9 +2,18 @@
 #include <crails/server.hpp>
 #include <crails/logger.hpp>
 #include <boost/lexical_cast.hpp>
+#include <sstream>
 
 using namespace std;
 using namespace Crails;
+
+static string log_query(const HttpRequest& request)
+{
+  stringstream stream;
+
+  stream << request;
+  return string("Crails::Client: query ") + stream.str();
+}
 
 template<typename STREAM>
 static HttpResponse http_query(STREAM& stream, const HttpRequest& request)
@@ -12,8 +21,10 @@ static HttpResponse http_query(STREAM& stream, const HttpRequest& request)
   HttpResponse              response;
   boost::beast::flat_buffer buffer;
 
+  logger << Logger::Debug << std::bind(log_query, request) << Logger::endl;
   boost::beast::http::write(stream, request);
   boost::beast::http::read(stream, buffer, response);
+  logger << Logger::Debug << "Crails::Client: received " << response << Logger::endl;
   return response;
 }
 
@@ -27,6 +38,8 @@ static void http_async_receive(STREAM& stream, std::function<void(const HttpResp
   {
     if (ec)
       logger << Logger::Error << "Crails::Client::http_async_receive failed: " << ec.message() << Logger::endl;
+    else
+      logger << Logger::Debug << "Crails::Client: received " << *response << Logger::endl;
     callback(*response, ec);
   });
 }
@@ -36,6 +49,7 @@ static void http_async_query(STREAM& stream, const HttpRequest& _request, std::f
 {
   auto request = make_shared<HttpRequest>(_request);
 
+  logger << Logger::Debug << std::bind(log_query, _request) << Logger::endl;
   boost::beast::http::async_write(stream, *request, [callback, &stream, request](boost::beast::error_code ec, size_t)
   {
     if (ec)

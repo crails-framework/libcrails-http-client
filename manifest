@@ -8,5 +8,5 @@ url: https://github.com/crails-framework/libcrails-http-client
 email: michael@unetresgrossebite.com
 depends: * build2 >= 0.15.0
 depends: * bpkg >= 0.15.0
-depends: libcrails ^2.0.0
+depends: { libcrails libcrails-logger } ^2.0.0
 depends: libboost-beast >= 1.74.0
