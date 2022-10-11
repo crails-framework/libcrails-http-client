@@ -72,11 +72,13 @@ Ssl::Client::Client(std::string_view host, unsigned short port) :
   ctx(boost::asio::ssl::context::tlsv12_client),
   stream(ioc, ctx)
 {
+  logger << Logger::Debug << "Ssl::Client constructor" << Logger::endl;
   ctx.set_verify_mode(boost::asio::ssl::verify_none);
 }
 
 Ssl::Client::~Client()
 {
+  logger << Logger::Debug << "Ssl::~Client" << Logger::endl;
   if (connected)
     disconnect();
 }
@@ -109,6 +111,7 @@ void Crails::Ssl::Client::disconnect()
   // Gracefully close the stream
   boost::beast::error_code ec;
 
+  logger << Logger::Debug << "Crails::Ssl::Client::disconnect" << Logger::endl;
   connected = false;
   stream.shutdown(ec);
   if (ec == boost::asio::error::eof)
@@ -138,10 +141,12 @@ Client::Client(std::string_view host, unsigned short port) :
   host(host), port(port),
   stream(Crails::Server::get_io_context())
 {
+  logger << Logger::Debug << "Crails::Client: constructor" << Logger::endl;
 }
 
 Client::~Client()
 {
+  logger << Logger::Debug << "Crails::~Client" << Logger::endl;
   if (connected)
     disconnect();
 }
@@ -159,6 +164,7 @@ void Client::disconnect()
 {
   try
   {
+    logger << Logger::Debug << "Crails::Client::disconnect" << Logger::endl;
     stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     connected = false;
   }
