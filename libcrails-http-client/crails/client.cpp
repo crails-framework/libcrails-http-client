@@ -9,10 +9,13 @@ using namespace Crails;
 
 static string log_query(const HttpRequest& request)
 {
+	/*
   stringstream stream;
 
   stream << request;
   return string("Crails::Client: query ") + stream.str();
+  */
+  return string("Crails::Client: query (log disabled due to http::request using buffer_body now)");
 }
 
 template<typename STREAM>
