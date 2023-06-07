@@ -63,7 +63,7 @@ namespace Crails
       client->connect();
       client->async_query(request, [this, client, self, callback](const HttpResponse& response, boost::beast::error_code ec)
       {
-        _context.protect([this, client, &response, ec, callback]()
+        _context.protect([client, &response, ec, callback]()
         {
           callback(response, ec);
           client->disconnect();
