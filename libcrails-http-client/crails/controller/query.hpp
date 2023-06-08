@@ -17,12 +17,12 @@ namespace Crails
     }
 
   protected:
-    HttpResponse http_query(const Url& url)
+    Client::Response http_query(const Url& url)
     {
       return http_query(url, {HttpVerb::get, '/' + url.target, 11});
     }
 
-    HttpResponse http_query(const Url& url, Crails::HttpRequest request)
+    Client::Response http_query(const Url& url, Client::Request request)
     {
       request.set(Crails::HttpHeader::host, url.host);
       if (url.ssl)
@@ -35,7 +35,7 @@ namespace Crails
       async_http_query(url, {HttpVerb::get, '/' + url.target, 11}, callback);
     }
 
-    void async_http_query(const Url& url, Crails::HttpRequest request, ClientInterface::AsyncCallback callback)
+    void async_http_query(const Url& url, Client::Request request, ClientInterface::AsyncCallback callback)
     {
       request.set(Crails::HttpHeader::host, url.host);
       if (url.ssl)
@@ -46,7 +46,7 @@ namespace Crails
 
   private:
     template<typename CLIENT_TYPE>
-    HttpResponse make_http_query(const Crails::Url& url, const Crails::HttpRequest& request)
+    Client::Response make_http_query(const Crails::Url& url, const Client::Request& request)
     {
       CLIENT_TYPE client(url.host, url.port);
 
@@ -55,13 +55,13 @@ namespace Crails
     }
 
     template<typename CLIENT_TYPE>
-    void make_async_http_query(const Crails::Url& url, const Crails::HttpRequest& request, ClientInterface::AsyncCallback callback)
+    void make_async_http_query(const Crails::Url& url, const Client::Request& request, ClientInterface::AsyncCallback callback)
     {
       auto client = std::make_shared<CLIENT_TYPE>(url.host, url.port);
       auto self = SUPER::shared_from_this();
 
       client->connect();
-      client->async_query(request, [this, client, self, callback](const HttpResponse& response, boost::beast::error_code ec)
+      client->async_query(request, [this, client, self, callback](const Client::Response& response, boost::beast::error_code ec)
       {
         _context.protect([client, &response, ec, callback]()
         {

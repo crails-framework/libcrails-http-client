@@ -7,21 +7,18 @@
 using namespace std;
 using namespace Crails;
 
-static string log_query(const HttpRequest& request)
+static string log_query(const Client::Request& request)
 {
-	/*
   stringstream stream;
 
   stream << request;
   return string("Crails::Client: query ") + stream.str();
-  */
-  return string("Crails::Client: query (log disabled due to http::request using buffer_body now)");
 }
 
 template<typename STREAM>
-static HttpResponse http_query(STREAM& stream, const HttpRequest& request)
+static Client::Response http_query(STREAM& stream, const Client::Request& request)
 {
-  HttpResponse              response;
+  Client::Response          response;
   boost::beast::flat_buffer buffer;
 
   logger << Logger::Debug << std::bind(log_query, request) << Logger::endl;
@@ -32,10 +29,10 @@ static HttpResponse http_query(STREAM& stream, const HttpRequest& request)
 }
 
 template<typename STREAM>
-static void http_async_receive(STREAM& stream, std::function<void(const HttpResponse&, boost::beast::error_code)> callback)
+static void http_async_receive(STREAM& stream, std::function<void(const Client::Response&, boost::beast::error_code)> callback)
 {
   auto buffer = make_shared<boost::beast::flat_buffer>();
-  auto response = make_shared<HttpResponse>();
+  auto response = make_shared<Client::Response>();
 
   boost::beast::http::async_read(stream, *buffer, *response, [callback, buffer, response](boost::beast::error_code ec, size_t)
   {
@@ -48,9 +45,9 @@ static void http_async_receive(STREAM& stream, std::function<void(const HttpResp
 }
 
 template<typename STREAM>
-static void http_async_query(STREAM& stream, const HttpRequest& _request, std::function<void(const HttpResponse&, boost::beast::error_code)> callback)
+static void http_async_query(STREAM& stream, const Client::Request& _request, std::function<void(const Client::Response&, boost::beast::error_code)> callback)
 {
-  auto request = make_shared<HttpRequest>(_request);
+  auto request = make_shared<Client::Request>(_request);
 
   logger << Logger::Debug << std::bind(log_query, _request) << Logger::endl;
   boost::beast::http::async_write(stream, *request, [callback, &stream, request](boost::beast::error_code ec, size_t)
@@ -58,7 +55,7 @@ static void http_async_query(STREAM& stream, const HttpRequest& _request, std::f
     if (ec)
     {
       logger << Logger::Error << "Crails::Client::http_async_query failed: " << ec.message() << Logger::endl;
-      callback(HttpResponse(), ec);
+      callback(Client::Response(), ec);
     }
     else
       http_async_receive(stream, callback);
@@ -127,12 +124,12 @@ void Crails::Ssl::Client::disconnect()
     throw boost::beast::system_error{ec};
 }
 
-HttpResponse Ssl::Client::query(const HttpRequest& request)
+Client::Response Ssl::Client::query(const Client::Request& request)
 {
   return http_query(stream, request);
 }
 
-void Ssl::Client::async_query(const HttpRequest& request, AsyncCallback callback)
+void Ssl::Client::async_query(const Client::Request& request, AsyncCallback callback)
 {
   http_async_query(stream, request, callback);
 }
@@ -177,12 +174,12 @@ void Client::disconnect()
   }
 }
 
-HttpResponse Client::query(const HttpRequest& request)
+Client::Response Client::query(const Request& request)
 {
   return http_query(stream, request);
 }
 
-void Client::async_query(const HttpRequest& request, AsyncCallback callback)
+void Client::async_query(const Request& request, AsyncCallback callback)
 {
   http_async_query(stream, request, callback);
 }

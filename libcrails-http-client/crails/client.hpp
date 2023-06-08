@@ -14,14 +14,16 @@ namespace Crails
 {
   struct ClientInterface
   {
-    typedef std::function<void(const HttpResponse&, boost::beast::error_code)>
+    typedef boost::beast::http::request<boost::beast::http::string_body>  Request;
+    typedef boost::beast::http::response<boost::beast::http::string_body> Response;
+    typedef std::function<void(const Response&, boost::beast::error_code)>
       AsyncCallback;
 
     virtual ~ClientInterface() {}
     virtual void connect() = 0;
     virtual void disconnect() = 0;
-    virtual HttpResponse query(const HttpRequest& request) = 0;
-    virtual void async_query(const HttpRequest& request, AsyncCallback) = 0;
+    virtual Response query(const Request& request) = 0;
+    virtual void async_query(const Request& request, AsyncCallback) = 0;
 
   protected:
     bool connected = false;
@@ -34,10 +36,10 @@ namespace Crails
     Client(std::string_view host, unsigned short port = 80);
     virtual ~Client() override;
 
-    HttpResponse query(const HttpRequest&) override;
-    void         async_query(const HttpRequest&, AsyncCallback) override;
-    void         connect() override;
-    void         disconnect() override;
+    Response query(const Request&) override;
+    void     async_query(const Request&, AsyncCallback) override;
+    void     connect() override;
+    void     disconnect() override;
 
   private:
     const std::string_view    host;
@@ -53,10 +55,10 @@ namespace Crails
       Client(std::string_view host, unsigned short port = 443);
       virtual ~Client() override;
 
-      HttpResponse query(const HttpRequest&) override;
-      void         async_query(const HttpRequest&, AsyncCallback) override;
-      void         connect() override;
-      void         disconnect() override;
+      Response query(const Request&) override;
+      void     async_query(const Request&, AsyncCallback) override;
+      void     connect() override;
+      void     disconnect() override;
 
     private:
       const std::string_view host;
