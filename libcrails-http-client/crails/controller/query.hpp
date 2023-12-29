@@ -3,6 +3,7 @@
 
 # include <crails/url.hpp>
 # include <crails/controller.hpp>
+# include <crails/context.hpp>
 # include "../client.hpp"
 
 namespace Crails
