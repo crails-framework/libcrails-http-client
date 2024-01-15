@@ -121,7 +121,9 @@ void Crails::Ssl::Client::disconnect()
     ec = {};
   }
   if (ec)
-    throw boost::beast::system_error{ec};
+  {
+    logger << Logger::Error << "Crails::Ssl::Client::disconnect: error occured " << boost::beast::system_error{ec}.what() << Logger::endl;
+  }
 }
 
 Client::Response Ssl::Client::query(const Client::Request& request)
