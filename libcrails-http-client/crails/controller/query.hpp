@@ -6,7 +6,7 @@
 # include <crails/url.hpp>
 # include <crails/controller.hpp>
 # include <crails/context.hpp>
-# include "../client.hpp"
+# include "../http_query.hpp"
 
 namespace Crails
 {
@@ -23,12 +23,12 @@ namespace Crails
     }
 
   protected:
-    static boost::asio::awaitable<Client::Response> co_http_query(Url url)
+    static boost::asio::awaitable<ClientInterface::Response> co_http_query(Url url)
     {
       return Crails::co_http_query(std::move(url));
     }
 
-    static boost::asio::awaitable<Client::Response> co_http_query(Url url, Client::Request request)
+    static boost::asio::awaitable<ClientInterface::Response> co_http_query(Url url, ClientInterface::Request request)
     {
       return Crails::co_http_query(std::move(url), std::move(request));
     }
@@ -38,12 +38,12 @@ namespace Crails
       async_http_query(url, make_request(HttpVerb::get, url), callback);
     }
 
-    void async_http_query(const Url& url, Client::Request request, ClientInterface::AsyncCallback callback)
+    void async_http_query(const Url& url, ClientInterface::Request request, ClientInterface::AsyncCallback callback)
     {
       this->co_spawn([url, request = std::move(request), callback]() mutable -> boost::asio::awaitable<void>
       {
         boost::beast::error_code ec;
-        Client::Response         response;
+        ClientInterface::Response response;
 
         try { response = co_await Crails::co_http_query(std::move(url), std::move(request)); }
         catch (const boost::system::system_error& error) { ec = error.code(); }
@@ -51,12 +51,12 @@ namespace Crails
       });
     }
 
-    Client::Response http_query(const Url& url)
+    ClientInterface::Response http_query(const Url& url)
     {
       return Crails::http_query(url, make_request(HttpVerb::get, url));
     }
 
-    Client::Response http_query(const Url& url, Client::Request request)
+    ClientInterface::Response http_query(const Url& url, ClientInterface::Request request)
     {
       return Crails::http_query(url, std::move(request));
     }
